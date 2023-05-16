@@ -46,13 +46,12 @@ class ScannerManagerImpl(
                 _connectionStatusFlow.emit(isConnected)
 
                 if (!isConnected) {
-                    connectToScanner()
+                    scannerService.connect()
                 }
 
                 delay(intervalMillis)
             }
         }
-
     }
 
     override fun stopMonitoring() {
@@ -76,19 +75,10 @@ class ScannerManagerImpl(
 //        logger.warn(Messages.getMessage("logging_connection_failed"))
     }
 
-    override suspend fun getBarcodeFlow(retryPolicy: RetryPolicy): Flow<Resource<Barcode>> = flow {
-        emit(Resource.Loading(true))
-        val conn = withRetry(retryPolicy) { scannerService.connect() }
-        emit(Resource.Loading(false))
-
-        if (conn.isSuccess) {
-            emitAll(scannerService.emitBarcode())
-        } else {
-            emit(Resource.Error("Unable to connect to scanner service"))
-//            throw ScannerServiceException("something went wrong")
-        }
-
-    }
-
+    override suspend fun getBarcodeFlow(retryPolicy: RetryPolicy): Flow<Resource<Barcode>> =
+        scannerService.emitBarcode()
+            .catch { e ->
+                emit(Resource.Error(e.localizedMessage))
+            }
 
 }

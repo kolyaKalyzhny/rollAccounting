@@ -4,24 +4,27 @@ import domain.interfaces.BarcodeRepository
 import domain.models.GS1128Label
 import domain.usecase.OutputProductLabel
 import domain.usecase.ProcessBarcodeV1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import presentation.BaseViewModel
 import utils.Resource
 
 class LabelViewModel(
     private val processBarcodeV1: ProcessBarcodeV1,
     private val barcodeRepository: BarcodeRepository,
     private val outputProductLabel: OutputProductLabel
-) {
+) : BaseViewModel(onError = {}) {
 
     private val _labelState = MutableStateFlow(LabelState())
     val labelState = _labelState.asStateFlow()
 
-    private lateinit var coroutineScope: CoroutineScope
+    private val _errors = MutableSharedFlow<String>()
+    val errors = _errors.asSharedFlow()
+
+    private val _outputLabelPrompt = MutableSharedFlow<List<GS1128Label>>()
+    val outputLabelPrompt = _outputLabelPrompt.asSharedFlow()
+
+
     private val _labels = MutableStateFlow<List<GS1128Label>>(emptyList())
     val labels = _labels.asStateFlow()
 
@@ -30,22 +33,21 @@ class LabelViewModel(
 //        handleScannerStatus()
 //        testScanner()
 
-
-//        TODO(
-//            "collect scannerManager's connectionFlow " +
-//                    "and update to UI accordingly"
-//        )
     }
 
     private fun handleProcessedBarcode() {
-        coroutineScope.launch {
+        viewModelScope.launch {
             processBarcodeV1().collect { result ->
                 when (result) {
                     is Resource.Loading -> {}
-                    is Resource.Error -> {}
+                    is Resource.Error -> {
+                        _errors.emit(result.message ?: "unexpected error occurred")
+                    }
+
                     is Resource.Success -> {
                         if (result.data == null) return@collect
 
+                        _outputLabelPrompt.emit(labelState.value.labels + result.data)
                         _labelState.update { currentState ->
                             currentState.copy(labels = currentState.labels + result.data)
                         }
@@ -56,12 +58,11 @@ class LabelViewModel(
     }
 
     private fun handleScannerStatus() {
-        coroutineScope.launch {
+        viewModelScope.launch {
             barcodeRepository.emitScannerStatus().collect { result ->
-                val isConnected = result.isSuccess
                 _labelState.update { currentState ->
-                    if (currentState.isScannerConnected != isConnected) {
-                        currentState.copy(isScannerConnected = isConnected)
+                    if (currentState.isScannerConnected != result) {
+                        currentState.copy(isScannerConnected = result)
                     } else currentState
                 }
             }
@@ -69,7 +70,7 @@ class LabelViewModel(
     }
 
     private fun confirmPrinting() {
-        coroutineScope.launch {
+        viewModelScope.launch {
             if (labels.value.isEmpty()) return@launch
 
             outputProductLabel(labels.value.first())
@@ -80,12 +81,25 @@ class LabelViewModel(
     }
 
 
+    fun showSnackbars() {
+        viewModelScope.launch {
+            val myFlow = flow<Unit> {
+                for (i in 0..10) {
+                    _errors.emit("number is $i")
+                }
+            }
+            myFlow.collect()
+        }
+    }
+
+
     private fun testScanner() {
-        coroutineScope.launch {
+        viewModelScope.launch {
             barcodeRepository.listenToBarcodeOutput().collect { result ->
                 when (result) {
                     is Resource.Error -> {
                         println(result.message ?: "no error message has been delivered")
+                        _errors.emit(result.message ?: "unexpected error occurred")
                     }
 
                     is Resource.Loading -> {

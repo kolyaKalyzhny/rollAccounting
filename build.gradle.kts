@@ -41,6 +41,9 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
                 implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
 
+                // This is used to set Dispatcher's main thread
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0-RC3")
+
                 implementation("org.tinylog:tinylog-api:2.3.2")
                 runtimeOnly("org.tinylog:tinylog-impl:2.3.2")
 

@@ -12,7 +12,8 @@ interface BarcodeRepository {
 
     //    suspend fun listenToBarcodeOutput(): Flow<Result<Barcode>>
     suspend fun listenToBarcodeOutput(): Flow<Resource<Barcode>>
-    fun emitScannerStatus(): Flow<Result<Unit>>
+//    fun emitScannerStatus(): Flow<Result<Unit>>
+    fun emitScannerStatus(): Flow<Boolean>
 
     fun mockConnection(): Flow<Resource<Unit>>
 }

@@ -23,21 +23,34 @@ class PioneerScannerService(
 
     override fun isConnected(): Boolean {
         val port = serialPort
-        return port != null && port.isOpen
+        if (port != null && port.isOpen) {
+            try {
+                port.outputStream.write(0)
+                return true
+            } catch (ex: Exception) {
+                serialPort?.closePort()
+                return false
+            }
+        }
+        return false
     }
 
     override fun connect(): Result<Unit> {
-        println("PioneerScannerService tries to connect")
         return try {
-            val port = SerialPort.getCommPort(portDescriptor)
-            if (port.isOpen) {
-                serialPort = port
-                Result.success(Unit)
-            } else {
-                Result.failure(
-                    ScannerServiceException(Messages.getMessage("scanner_service_connection_error"))
-                )
+            val ports = SerialPort.getCommPorts()
+            val foundPort =
+                ports.find { it.toString() == portDescriptor }
+                    ?: return Result.failure(
+                        ScannerServiceException(Messages.getMessage("Port not found"))
+                    )
+            foundPort.openPort()
+
+            if (!foundPort.openPort()) {
+                return Result.failure(ScannerServiceException("unable to connect to the comm port"))
             }
+
+            serialPort = foundPort
+            Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(exception)
         }
@@ -74,7 +87,6 @@ class PioneerScannerService(
     //    override fun emitBarcode(): Flow<Result<Barcode>> = callbackFlow {
     override fun emitBarcode(): Flow<Resource<Barcode>> = callbackFlow {
         val port = serialPort ?: throw IllegalStateException("Serial port not initialized. Please connect first.")
-
 
         val dataListener = object : SerialPortDataListener {
 

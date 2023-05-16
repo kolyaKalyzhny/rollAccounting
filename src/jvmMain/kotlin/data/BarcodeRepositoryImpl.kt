@@ -52,8 +52,8 @@ class BarcodeRepositoryImpl(
 
     }
 
-    override fun emitScannerStatus(): Flow<Result<Unit>> {
-        return scannerService.monitorConnection(Config.portCheckhealth)
+    override fun emitScannerStatus(): Flow<Boolean> {
+        return scannerManager.connectionStatusFlow
     }
 
     override fun mockConnection():

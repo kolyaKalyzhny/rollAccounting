@@ -10,6 +10,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import di.initKoin
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.setMain
 import org.koin.core.Koin
 import presentation.label.LabelScreen
 
@@ -32,8 +37,11 @@ fun App() {
 }
 
 lateinit var koin: Koin
+
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 fun main() = application {
     koin = initKoin().koin
+    Dispatchers.setMain(newSingleThreadContext("UI Thread"))
 
     Window(onCloseRequest = ::exitApplication) {
         App()
