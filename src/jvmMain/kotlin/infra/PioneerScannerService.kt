@@ -27,6 +27,7 @@ class PioneerScannerService(
     }
 
     override fun connect(): Result<Unit> {
+        println("PioneerScannerService tries to connect")
         return try {
             val port = SerialPort.getCommPort(portDescriptor)
             if (port.isOpen) {

@@ -1,6 +1,7 @@
 package infra
 
 import config.Config
+import data.interfaces.NetworkService
 import data.remote.TcpNetworkService
 import domain.interfaces.PrintingService
 import domain.interfaces.printer.ZPLCommandCreator
@@ -8,7 +9,7 @@ import domain.models.GS1128Label
 import kotlinx.coroutines.flow.Flow
 
 class ZPLPrintingService(
-    private val networkService: TcpNetworkService,
+    private val networkService: NetworkService,
     private val zplCommandCreator: ZPLCommandCreator
 ) : PrintingService {
     override suspend fun printLabel(label: GS1128Label): Result<Unit> {

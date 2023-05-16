@@ -45,4 +45,8 @@ class MockBarcodeRepository : BarcodeRepository {
         TODO()
     }
 
+    override fun mockConnection(): Flow<Resource<Unit>> {
+        TODO("Not yet implemented")
+    }
+
 }

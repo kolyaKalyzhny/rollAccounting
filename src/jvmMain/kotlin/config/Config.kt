@@ -24,4 +24,6 @@ object Config {
         get() = properties.getProperty("printer_port").toInt()
     val backendUrl: String
         get() = properties.getProperty("backend_url")
+    val scannerPortDescriptor
+        get() = properties.getProperty("scanner_port_descriptor")
 }

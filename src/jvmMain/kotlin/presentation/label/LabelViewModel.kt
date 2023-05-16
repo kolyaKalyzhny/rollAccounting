@@ -28,12 +28,13 @@ class LabelViewModel(
     init {
 //        handleProcessedBarcode()
 //        handleScannerStatus()
-        testScanner()
+//        testScanner()
 
-        TODO(
-            "collect scannerManager's connectionFlow " +
-                    "and update to UI accordingly"
-        )
+
+//        TODO(
+//            "collect scannerManager's connectionFlow " +
+//                    "and update to UI accordingly"
+//        )
     }
 
     private fun handleProcessedBarcode() {

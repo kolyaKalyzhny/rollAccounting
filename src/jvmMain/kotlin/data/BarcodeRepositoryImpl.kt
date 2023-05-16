@@ -8,8 +8,11 @@ import domain.interfaces.scanner.ScannerService
 import domain.models.Barcode
 import domain.models.GS1128Label
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import utils.Resource
 import utils.RetryPolicy
+import utils.withRetry
 
 class BarcodeRepositoryImpl(
     private val scannerService: ScannerService,
@@ -17,9 +20,9 @@ class BarcodeRepositoryImpl(
     private val restService: RestService
 ) : BarcodeRepository {
 
-    init {
-        scannerService.connect()
-    }
+//    init {
+//        scannerService.connect()
+//    }
 
     override suspend fun scanBarcode(): Result<Barcode> {
         return try {
@@ -52,6 +55,22 @@ class BarcodeRepositoryImpl(
     override fun emitScannerStatus(): Flow<Result<Unit>> {
         return scannerService.monitorConnection(Config.portCheckhealth)
     }
+
+    override fun mockConnection():
+            Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading(true))
+
+        val conn = withRetry(RetryPolicy(delayMillis = 3000L)) { scannerService.connect() }
+        emit(Resource.Loading(false))
+
+        if (conn.isSuccess) {
+            emit(Resource.Success(Unit))
+        } else {
+            emit(Resource.Error("Unable to connect to scanner service"))
+//            throw ScannerServiceException("something went wrong")
+        }
+    }
+
 
     fun close() {
         scannerService.disconnect()

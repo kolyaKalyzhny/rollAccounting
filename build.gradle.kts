@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+//    kotlin("kapt") version "1.8.0"
 //    kotlin("jvm") version "1.8.20"
 }
 
@@ -21,7 +22,14 @@ repositories {
 kotlin {
     jvm {
         jvmToolchain(11)
+//        jvmToolchain(19)
         withJava()
+
+//        compilations.all {
+//            kotlinOptions {
+//                jvmTarget = "19"
+//            }
+//        }
     }
     sourceSets {
         val jvmMain by getting {
@@ -48,6 +56,10 @@ kotlin {
 
                 // Kotlin-Logging
 
+                // DI
+                implementation("io.insert-koin:koin-core:3.4.0")
+//                kapt("com.google.dagger:dagger-compiler:2.x")
+
             }
         }
         val jvmTest by getting {
@@ -56,6 +68,9 @@ kotlin {
                 implementation("io.mockk:mockk:1.12.0")
 //                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0-RC3")
+
+                // DI
+                implementation("io.insert-koin:koin-test:3.4.0")
             }
 
         }

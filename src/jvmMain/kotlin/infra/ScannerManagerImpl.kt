@@ -18,7 +18,7 @@ import utils.withRetry
 class ScannerManagerImpl(
     private val coroutineScope: CoroutineScope,
     private val scannerService: ScannerService,
-    private val logger: CustomLogger,
+//    private val logger: CustomLogger,
     private val maxConnectionRetries: Int = 3,
     private val monitoringIntervalMillis: Long = 5000L,
 ) : ScannerManager {
@@ -61,7 +61,7 @@ class ScannerManagerImpl(
     }
 
     override suspend fun connectToScanner() {
-        logger.info(Messages.getMessage("logging_establishing_connection"))
+//        logger.info(Messages.getMessage("logging_establishing_connection"))
         var retries = 0
 
         while (retries < maxConnectionRetries) {
@@ -73,7 +73,7 @@ class ScannerManagerImpl(
             delay(5000)
         }
 
-        logger.warn(Messages.getMessage("logging_connection_failed"))
+//        logger.warn(Messages.getMessage("logging_connection_failed"))
     }
 
     override suspend fun getBarcodeFlow(retryPolicy: RetryPolicy): Flow<Resource<Barcode>> = flow {
