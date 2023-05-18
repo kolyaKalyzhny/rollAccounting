@@ -8,7 +8,10 @@ data class Barcode(
     val value: String
 ) {
     init {
-        require(value.length == Config.barcodeLength) { BarcodeException("barcode_length_error") }
+        if (value.length != Config.barcodeLength) {
+            throw BarcodeException("barcode_length_error")
+        }
+//        require(value.length == Config.barcodeLength) { BarcodeException("barcode_length_error") }
         //TODO: check whether the value contains GS
     }
 }

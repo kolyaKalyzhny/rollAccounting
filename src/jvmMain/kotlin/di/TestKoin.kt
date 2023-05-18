@@ -1,6 +1,7 @@
 package di
 
 import com.google.gson.Gson
+import config.Config
 import data.BarcodeRepositoryImpl
 import data.TestRepositoryImpl
 import data.interfaces.NetworkService
@@ -39,7 +40,7 @@ object TestModules {
 ////        single<CustomLogger> { FileLogger() }
 //
         single<RestService> { OkHttpRestService(get(), get()) }
-        single<ScannerService> { PioneerScannerService("ACM0") }
+        single<ScannerService> { PioneerScannerService(Config.scannerPortDescriptor) }
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 //
         single<ZPLCommandCreator> { DefaultZPLCommandCreator() }
@@ -62,7 +63,8 @@ object TestModules {
             LabelViewModel(
                 processBarcodeV1 = get(),
                 outputProductLabel = get(),
-                barcodeRepository = get()
+                barcodeRepository = get(),
+                printingService = get()
             )
         }
 

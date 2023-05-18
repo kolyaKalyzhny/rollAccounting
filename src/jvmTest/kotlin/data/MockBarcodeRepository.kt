@@ -41,7 +41,7 @@ class MockBarcodeRepository : BarcodeRepository {
         return (1..31).map { Random.nextInt(0, 10) }.joinToString("")
     }
 
-    override fun emitScannerStatus(): Flow<Result<Unit>> = flow {
+    override fun emitScannerStatus(): Flow<Boolean> = flow {
         TODO()
     }
 

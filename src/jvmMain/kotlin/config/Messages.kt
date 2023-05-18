@@ -6,7 +6,7 @@ object Messages {
     private val properties: Properties = Properties()
 
     init {
-        val inputStream = javaClass.classLoader.getResourceAsStream("config.properties")
+        val inputStream = javaClass.classLoader.getResourceAsStream("messages.properties")
         properties.load(inputStream)
     }
 
