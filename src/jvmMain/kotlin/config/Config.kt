@@ -1,5 +1,6 @@
 package config
 
+import java.io.FileOutputStream
 import java.util.Properties
 
 object Config {
@@ -10,12 +11,22 @@ object Config {
         properties.load(inputStream)
     }
 
+
+    fun updateConfigProperties() {
+
+    }
+
+
     val barcodeLength: Int
         get() = properties.getProperty("barcode_length").toInt()
     val gs1128Format: String
         get() = properties.getProperty("GS1128_format").toString()
-    val datePattern: String
+    var datePattern: String
         get() = properties.getProperty("date_pattern").toString()
+        set(value) {
+            properties.setProperty("date_pattern", value)
+            saveProps()
+        }
     val portCheckhealth: Long
         get() = properties.getProperty("port_checkhealth").toLong()
     val printerIp: String
@@ -26,4 +37,11 @@ object Config {
         get() = properties.getProperty("backend_url")
     val scannerPortDescriptor
         get() = properties.getProperty("scanner_port_descriptor")
+
+
+    private fun saveProps() {
+        val outputStream = FileOutputStream("config.properties")
+        properties.store(outputStream, null)
+        outputStream.close()
+    }
 }
