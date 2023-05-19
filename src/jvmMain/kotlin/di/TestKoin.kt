@@ -1,7 +1,7 @@
 package di
 
 import com.google.gson.Gson
-import config.Config
+import config.*
 import data.BarcodeRepositoryImpl
 import data.TestRepositoryImpl
 import data.interfaces.NetworkService
@@ -25,6 +25,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import presentation.TestViewModel
 import presentation.label.LabelViewModel
+import presentation.settings.SettingsViewModel
 import utils.DefaultRetryPolicy
 
 //        single<LabelCreationService> { LabelCreationServiceImpl() }
@@ -58,6 +59,16 @@ object TestModules {
 //
         single<OutputProductLabel> { OutputProductLabel(get(), get()) }
         single<ProcessBarcodeV1> { ProcessBarcodeV1(get(), get()) }
+
+        single<ConfigurationManager> { DefaultConfigurationManager() }
+        single<ConfigurationManager> { FileConfigurationManager() }
+
+        single<ConfigurationService> {
+            ConfigurationServiceImpl(
+                defaults = get(),
+                overrides = get()
+            )
+        }
 //
         factory<LabelViewModel> {
             LabelViewModel(
@@ -66,6 +77,9 @@ object TestModules {
                 barcodeRepository = get(),
                 printingService = get()
             )
+        }
+        factory<SettingsViewModel> {
+            SettingsViewModel(configurationService = get())
         }
 
         factory<TestViewModel> {

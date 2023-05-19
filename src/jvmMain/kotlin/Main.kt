@@ -16,6 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.test.setMain
 import org.koin.core.Koin
+import presentation.ParentContainer
 import presentation.label.LabelScreen
 import presentation.settings.SettingsScreen
 
@@ -34,7 +35,7 @@ fun App() {
 
     MaterialTheme {
 //        LabelScreen()
-        SettingsScreen()
+        ParentContainer()
     }
 }
 
