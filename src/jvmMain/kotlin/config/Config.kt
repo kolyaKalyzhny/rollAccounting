@@ -6,6 +6,13 @@ import java.util.Properties
 object Config {
     private val properties: Properties = Properties()
 
+    const val DATE_PATTERN_KEY = "date_pattern"
+    const val LABEL_PATTERN_KEY = "GS1128_format"
+    const val PRINTER_IP_KEY = "printer_ip"
+    const val PRINTER_PORT_KEY = "printer_port"
+    const val SCANNER_NAME_KEY = "scanner_port_descriptor"
+    const val BACKEND_URL_KEY = "backend_url"
+
     init {
         val inputStream = javaClass.classLoader.getResourceAsStream("config.properties")
         properties.load(inputStream)
@@ -37,6 +44,7 @@ object Config {
         get() = properties.getProperty("backend_url")
     val scannerPortDescriptor
         get() = properties.getProperty("scanner_port_descriptor")
+
 
 
     private fun saveProps() {

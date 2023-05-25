@@ -28,23 +28,23 @@ fun LabelScreen(
     }
 
 
-    LaunchedEffect(Unit) {
-        viewModel.success.collect {
-            successSnackbarState.value = true
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.outputLabelPrompt.collect {
-            dialogState.value = DialogState(content = it.value, isVisible = true)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.errors.collect {
-            scaffoldState.snackbarHostState.showSnackbar(it)
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.success.collect {
+//            successSnackbarState.value = true
+//        }
+//    }
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.outputLabelPrompt.collect {
+//            dialogState.value = DialogState(content = it.value, isVisible = true)
+//        }
+//    }
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.errors.collect {
+//            scaffoldState.snackbarHostState.showSnackbar(it)
+//        }
+//    }
 
     fun onDismissDialog() {
         dialogState.value = dialogState.value.copy(isVisible = false)
@@ -55,48 +55,82 @@ fun LabelScreen(
     }
 
 
-    Scaffold(
-        scaffoldState = scaffoldState
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (dialogState.value.isVisible) {
-                ConfirmationDialog(
-                    onDismiss = { onDismissDialog() },
-                    title = UIResources.confirm_printing,
-                    content = dialogState.value.content
-                )
-            }
-
-            AutoDismissSnackbar(showSnackBar = successSnackbarState.value, onDismiss = { onDismissSnackbar() })
-
-            TextButton(onClick = { viewModel.emitSuccessEvent() }) {
-                Text(text = "success event")
-            }
-
-
-            TextButton(onClick = { viewModel.printLabel() }) {
-                Text(text = "Print Label")
-            }
-
-            Column {
-                AppTitle(UIResources.app_title)
-                Spacer(Modifier.height(8.dp))
-                ConnectionStatus(labelState.isScannerConnected)
-                Spacer(Modifier.height(8.dp))
-                Instructions(
-                    UIResources.instruction_set
-
-                )
-                Spacer(Modifier.height(8.dp))
-                Statistics(labelState.processedAmount)
-            }
-
+        if (dialogState.value.isVisible) {
+            ConfirmationDialog(
+                onDismiss = { onDismissDialog() },
+                title = UIResources.confirm_printing,
+                content = dialogState.value.content
+            )
         }
+
+        AutoDismissSnackbar(showSnackBar = successSnackbarState.value, onDismiss = { onDismissSnackbar() })
+
+        Column {
+            AppTitle(UIResources.app_title)
+            Spacer(Modifier.height(8.dp))
+            ConnectionStatus(labelState.isScannerConnected)
+            Spacer(Modifier.height(8.dp))
+            Instructions(
+                UIResources.instruction_set
+
+            )
+            Spacer(Modifier.height(8.dp))
+            Statistics(labelState.processedAmount)
+        }
+
     }
+
+
+
+
+//    Scaffold(
+//        scaffoldState = scaffoldState
+//    ) {
+//        Column(
+//            modifier = Modifier.fillMaxSize().padding(16.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            if (dialogState.value.isVisible) {
+//                ConfirmationDialog(
+//                    onDismiss = { onDismissDialog() },
+//                    title = UIResources.confirm_printing,
+//                    content = dialogState.value.content
+//                )
+//            }
+//
+//            AutoDismissSnackbar(showSnackBar = successSnackbarState.value, onDismiss = { onDismissSnackbar() })
+//
+//            TextButton(onClick = { viewModel.emitSuccessEvent() }) {
+//                Text(text = "success event")
+//            }
+//
+//
+//            TextButton(onClick = { viewModel.printLabel() }) {
+//                Text(text = "Print Label")
+//            }
+//
+//            Column {
+//                AppTitle(UIResources.app_title)
+//                Spacer(Modifier.height(8.dp))
+//                ConnectionStatus(labelState.isScannerConnected)
+//                Spacer(Modifier.height(8.dp))
+//                Instructions(
+//                    UIResources.instruction_set
+//
+//                )
+//                Spacer(Modifier.height(8.dp))
+//                Statistics(labelState.processedAmount)
+//            }
+//
+//        }
+//    }
 
 
 }

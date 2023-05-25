@@ -11,9 +11,18 @@ abstract class BaseViewModel(
     private val _baseErrors = MutableSharedFlow<String>()
     val baseErrors = _baseErrors.asSharedFlow()
 
+    private val _baseSuccesses = MutableSharedFlow<String>()
+    val baseSuccesses = _baseSuccesses.asSharedFlow()
+
     protected fun emitError(error: String) {
         viewModelScope.launch {
             _baseErrors.emit(error)
+        }
+    }
+
+    protected fun emitSuccess(success: String) {
+        viewModelScope.launch {
+            _baseSuccesses.emit(success)
         }
     }
 

@@ -2,12 +2,15 @@ package presentation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import config.UIResources
 import koin
+import kotlinx.coroutines.flow.collect
 import presentation.label.*
 import presentation.settings.SettingsScreen
 import presentation.settings.SettingsViewModel
@@ -30,22 +33,37 @@ fun ParentContainer(
         }
     }
 
+
+    LaunchedEffect(Unit) {
+        settingsViewModel.baseSuccesses.collect {
+            scaffoldState.snackbarHostState.showSnackbar(it)
+        }
+    }
+
     val btnText = if (showSettings) "tick" else "tack"
 
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             Row {
-                Button(onClick = { showSettings = !showSettings }) {
-                    Text(text = btnText)
+                IconButton(onClick = { showSettings = !showSettings }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = UIResources.settings
+                    )
                 }
+
+//                Button(onClick = { showSettings = !showSettings }) {
+//                    Text(text = btnText)
+//                }
             }
         }
     ) {
         Box(
             contentAlignment = Alignment.Center
         ) {
-            LabelComponent(labelViewModel)
+//            LabelComponent(labelViewModel)
+            LabelScreen(labelViewModel)
             if (showSettings) {
                 BoxWithConstraints {
                     SettingsScreen(

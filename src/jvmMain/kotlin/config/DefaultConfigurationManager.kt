@@ -12,7 +12,12 @@ class DefaultConfigurationManager : ConfigurationManager {
     }
 
     override suspend fun get(key: String): String? {
-        return properties.getProperty(key)
+
+
+        val message = properties.getProperty(key) ?: throw IllegalArgumentException("No message found for key: $key")
+        return String.format(message)
+
+//        return properties.getProperty(key)
     }
 
 
@@ -22,5 +27,13 @@ class DefaultConfigurationManager : ConfigurationManager {
 
     override suspend fun save() {
         throw UnsupportedOperationException("cannot save default configurations")
+    }
+
+    override suspend fun clearKey(key: String) {
+        throw UnsupportedOperationException("cannot clearKey default configurations")
+    }
+
+    override suspend fun clearAll() {
+        throw UnsupportedOperationException("cannot clearAll default configurations")
     }
 }

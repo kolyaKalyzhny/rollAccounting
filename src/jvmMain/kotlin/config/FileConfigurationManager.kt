@@ -27,6 +27,9 @@ class FileConfigurationManager : ConfigurationManager {
 
     override suspend fun get(key: String): String? = withContext(Dispatchers.IO) {
         properties.getProperty(key)
+
+//        val message = properties.getProperty(key) ?: throw IllegalArgumentException("No message found for key: $key")
+//        String.format(message)
     }
 
     override suspend fun set(key: String, value: String): Unit = withContext(Dispatchers.IO) {
@@ -40,5 +43,13 @@ class FileConfigurationManager : ConfigurationManager {
         } catch (e: IOException) {
             throw ConfigError.SaveError(e)
         }
+    }
+
+    override suspend fun clearKey(key: String) {
+        properties.remove(key)
+    }
+
+    override suspend fun clearAll() {
+        properties.clear()
     }
 }

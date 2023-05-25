@@ -41,6 +41,7 @@ class ProcessBarcodeV1Test {
         // Act
         val result = processBarcode().first()
 
+        println(expectedGtin)
         println(result.data)
         println(expectedLabelResult)
 

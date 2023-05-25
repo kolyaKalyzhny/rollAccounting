@@ -1,12 +1,11 @@
 package presentation.settings
 
 import config.Config
+import config.UIResources
 import domain.interfaces.ConfigurationService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import presentation.BaseViewModel
-
 
 class SettingsViewModel(
     private val configurationService: ConfigurationService
@@ -17,7 +16,7 @@ class SettingsViewModel(
     val settingsState = _settingsState.asStateFlow()
 
     init {
-        onEvent(SettingsEvent.SetDefaults)
+        loadSettings()
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -26,65 +25,118 @@ class SettingsViewModel(
             is SettingsEvent.SetLabelPattern -> setLabelPattern(event.value)
             is SettingsEvent.SetPrinterIp -> setPrinterIp(event.value)
             is SettingsEvent.SetPrinterPort -> setPrinterPort(event.value)
+            is SettingsEvent.SetBackendUrl -> setBackendUrl(event.value)
+            is SettingsEvent.SetScannerName -> setScannerName(event.value)
             is SettingsEvent.SetDefaults -> setDefaults()
             is SettingsEvent.SaveSettings -> saveSettings()
         }
     }
 
-    private fun setDefaults() {
-        val datePattern = Config.datePattern
-        val labelPattern = Config.gs1128Format
-        val printerIp = Config.printerIp
-        val printerPort = Config.printerPort.toString()
+    private fun loadSettings() {
+        viewModelScope.launch {
+            try {
+                val datePattern = configurationService.get(Config.DATE_PATTERN_KEY)
+                val labelPattern = configurationService.get(Config.LABEL_PATTERN_KEY)
+                val printerIp = configurationService.get(Config.PRINTER_IP_KEY)
+                val printerPort = configurationService.get(Config.PRINTER_PORT_KEY)
+                val scannerName = configurationService.get(Config.SCANNER_NAME_KEY)
+                val backendUrl = configurationService.get(Config.BACKEND_URL_KEY)
 
-        _settingsState.update { currentState ->
-            currentState.copy(
-                datePattern = datePattern,
-                labelPattern = labelPattern,
-                printerIp = printerIp,
-                printerPort = printerPort
-            )
+                _settingsState.update { currentState ->
+                    currentState.copy(
+                        datePattern = datePattern,
+                        labelPattern = labelPattern,
+                        printerIp = printerIp,
+                        printerPort = printerPort,
+                        scannerName = scannerName,
+                        backendUrl = backendUrl
+                    )
+                }
+            } catch (e: Exception) {
+                println(e.localizedMessage)
+                emitError(e.localizedMessage)
+            }
+        }
+    }
+
+    private fun setDefaults() {
+        viewModelScope.launch {
+            try {
+                configurationService.setDefaultsAll()
+                loadSettings()
+                emitSuccess(UIResources.settings_resetting_defaults)
+            } catch (e: Exception) {
+                emitError(e.localizedMessage)
+            }
         }
     }
 
 
     private fun setDatePattern(value: String) {
         _settingsState.update { currentState ->
-            currentState.copy(datePattern = currentState.datePattern + value)
+            currentState.copy(datePattern = value)
         }
     }
 
     private fun setLabelPattern(value: String) {
         _settingsState.update { currentState ->
-            currentState.copy(labelPattern = currentState.labelPattern + value)
+            currentState.copy(labelPattern = value)
         }
     }
 
     private fun setPrinterIp(value: String) {
         _settingsState.update { currentState ->
-            currentState.copy(printerIp = currentState.printerIp + value)
+            currentState.copy(printerIp = value)
         }
     }
 
     private fun setPrinterPort(value: String) {
         _settingsState.update { currentState ->
-            currentState.copy(printerPort = currentState.printerPort + value)
+            currentState.copy(printerPort = value)
         }
     }
 
+    private fun setBackendUrl(value: String) {
+        _settingsState.update { currentState ->
+            currentState.copy(backendUrl = value)
+        }
+    }
+
+    private fun setScannerName(value: String) {
+        _settingsState.update { currentState ->
+            currentState.copy(scannerName = value)
+        }
+    }
+
+
     private fun saveSettings() {
-        TODO("set all the config fields" +
-                "Notify USER on success")
+        viewModelScope.launch {
+            saveSettingsFlow().collect { result ->
+                if (result) {
+                    emitSuccess(UIResources.settings_saving_succeeded)
+                }
+            }
+        }
     }
 
-    fun updateConfig() {
-        val number = (0..10).random()
-        Config.datePattern = number.toString()
+
+    private fun saveSettingsFlow(): Flow<Boolean> {
+        return flow {
+            try {
+                val currentState = settingsState.value
+
+                for (property in currentState.toMap()) {
+                    if (property.value.isNotEmpty())
+                        configurationService.set(
+                            key = property.key, value = property.value
+                        )
+                }
+                emit(true)
+            } catch (e: Exception) {
+                emitError(e.localizedMessage)
+            }
+        }
     }
 
-    fun getFresh() {
-        val pattern = Config.datePattern
-        println(pattern)
-    }
 
 }

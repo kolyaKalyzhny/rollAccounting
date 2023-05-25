@@ -15,7 +15,12 @@ object UIResources {
     const val scanner_name="Наименование сканера"
     const val gtin_pattern="Шаблон GTIN'а"
     const val date_pattern="Шаблон даты"
-    const val settings_save_changes="Сохранить"
+    const val backend_url="URL сервера"
+    const val settings_save_changes="Сохранить настройки"
+    const val settings_set_defaults="Сбросить настройки"
+    const val settings_saving_succeeded="Настройки успешно сохранены"
+    const val settings_resetting_defaults="Дефолтные настройки успешно установлены"
+    const val settings="settings"
     val instruction_set = listOf(
         "Убедитесь, что сканер подключен.",
         "Сканируйте код рулона.",

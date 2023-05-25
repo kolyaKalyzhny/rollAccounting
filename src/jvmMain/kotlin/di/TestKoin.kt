@@ -22,6 +22,7 @@ import okhttp3.OkHttpClient
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import presentation.TestViewModel
 import presentation.label.LabelViewModel
@@ -32,6 +33,9 @@ import utils.DefaultRetryPolicy
 //        single<TestRepository> { TestRepositoryImpl(get()) }
 //        factory<TestViewModel> { TestViewModel(get()) }
 object TestModules {
+    private val configManagerDefault = named("Default")
+    private val configManagerFile = named("Overrides")
+
     val appModule = module {
 
         single<JsonParser> { GSONParser(Gson()) }
@@ -60,17 +64,17 @@ object TestModules {
         single<OutputProductLabel> { OutputProductLabel(get(), get()) }
         single<ProcessBarcodeV1> { ProcessBarcodeV1(get(), get()) }
 
-        single<ConfigurationManager> { DefaultConfigurationManager() }
-        single<ConfigurationManager> { FileConfigurationManager() }
+        single<ConfigurationManager>(configManagerDefault) { DefaultConfigurationManager() }
+        single<ConfigurationManager>(configManagerFile) { FileConfigurationManager() }
 
         single<ConfigurationService> {
             ConfigurationServiceImpl(
-                defaults = get(),
-                overrides = get()
+                defaults = get(configManagerDefault),
+                overrides = get(configManagerFile)
             )
         }
 //
-        factory<LabelViewModel> {
+        single<LabelViewModel> {
             LabelViewModel(
                 processBarcodeV1 = get(),
                 outputProductLabel = get(),
@@ -78,7 +82,7 @@ object TestModules {
                 printingService = get()
             )
         }
-        factory<SettingsViewModel> {
+        single<SettingsViewModel> {
             SettingsViewModel(configurationService = get())
         }
 
